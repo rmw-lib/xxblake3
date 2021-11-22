@@ -6,7 +6,7 @@ use std::convert::TryInto;
 use twox_hash::xxh3::{hash64, Hash64};
 
 const LEN_U64: usize = std::mem::size_of::<u64>();
-const H64_SEED: u64 = 181855_198662_19491001;
+const H64_SEED: u64 = 18_185_519_866_219_491_001;
 
 #[inline]
 pub fn hash_data_secret(secret: &[u8], data: &[u8]) -> u64 {
@@ -23,7 +23,7 @@ macro_rules! xor {
 }
 
 pub fn encrypt(secret: &[u8], data: &[u8]) -> Box<[u8]> {
-  let hash = hash64(&data);
+  let hash = hash64(data);
 
   let out_len = LEN_U64 + data.len();
   let mut out = unsafe { Box::<[u8]>::new_uninit_slice(out_len).assume_init() };
