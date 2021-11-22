@@ -1,3 +1,5 @@
+#![feature(new_uninit)]
+
 use blake3::Hasher;
 use core::hash::Hasher as _;
 use std::convert::TryInto;
