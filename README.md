@@ -20,6 +20,9 @@ fn main() {
 
   let mut encrypted = encrypt(&secret, data);
 
+  println!("data len {}", data.len());
+  println!("encrypted len {}", encrypted.len());
+
   assert_eq!(*data, *decrypt(&secret, &encrypted).unwrap());
 
   encrypted[9] = !encrypted[9];
