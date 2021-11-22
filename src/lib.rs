@@ -6,7 +6,7 @@ use std::convert::TryInto;
 use twox_hash::xxh3::{hash64, Hash64};
 
 const LEN_U64: usize = std::mem::size_of::<u64>();
-const H64_SEED: u64 = 18_185_519_866_219_491_001;
+const H64_SEED: u64 = 1;
 
 #[inline]
 pub fn hash_data_secret(secret: &[u8], data: &[u8]) -> u64 {
