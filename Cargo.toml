@@ -2,7 +2,7 @@
 name = "xxblake3"
 authors = ["rmw <i@rmw.link>"]
 edition = "2021"
-version = "0.0.4"
+version = "0.0.5"
 license = "AGPL-3.0-or-later"
 description = "encryption and decryption based on xxh3 and blake3"
 repository = "https://github.com/rmw-lib/xxblake3"
