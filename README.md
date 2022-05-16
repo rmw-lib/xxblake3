@@ -29,7 +29,6 @@ fn main() {
 
   assert_eq!(None, decrypt(&secret, &encrypted));
 }
-
 ```
 
 impl code
@@ -101,7 +100,6 @@ pub fn decrypt(secret: &[u8], data: &[u8]) -> Option<Box<[u8]>> {
     Some(out)
   }
 }
-
 ```
 
 ## step
