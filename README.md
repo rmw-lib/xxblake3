@@ -16,18 +16,19 @@ fn main() {
     27, 28, 29, 30, 31, 32,
   ];
 
+  let iv = 1u32.to_le_bytes();
   let data = "test msg".as_bytes();
 
-  let mut encrypted = encrypt(&secret, data);
+  let mut encrypted = encrypt(&secret, &iv, data);
 
   println!("data len {}", data.len());
   println!("encrypted len {}", encrypted.len());
 
-  assert_eq!(*data, *decrypt(&secret, &encrypted).unwrap());
+  assert_eq!(*data, *decrypt(&secret, &iv, &encrypted).unwrap());
 
   encrypted[9] = !encrypted[9];
 
-  assert_eq!(None, decrypt(&secret, &encrypted));
+  assert_eq!(None, decrypt(&secret, &iv, &encrypted));
 }
 ```
 
@@ -58,7 +59,7 @@ macro_rules! xor {
   };
 }
 
-pub fn encrypt(secret: &[u8], data: &[u8]) -> Box<[u8]> {
+pub fn encrypt(secret: &[u8], iv: &[u8], data: &[u8]) -> Box<[u8]> {
   let hash = hash64(data);
 
   let out_len = LEN_U64 + data.len();
@@ -66,8 +67,9 @@ pub fn encrypt(secret: &[u8], data: &[u8]) -> Box<[u8]> {
   let out_data = &mut out[LEN_U64..];
 
   Hasher::new()
-    .update(secret)
     .update(&hash.to_le_bytes())
+    .update(iv)
+    .update(secret)
     .finalize_xof()
     .fill(out_data);
 
@@ -80,15 +82,16 @@ pub fn encrypt(secret: &[u8], data: &[u8]) -> Box<[u8]> {
   out
 }
 
-pub fn decrypt(secret: &[u8], data: &[u8]) -> Option<Box<[u8]>> {
+pub fn decrypt(secret: &[u8], iv: &[u8], data: &[u8]) -> Option<Box<[u8]>> {
   let ed = &data[LEN_U64..];
   let hash = u64::from_le_bytes(data[..LEN_U64].try_into().unwrap()) ^ hash_data_secret(ed, secret);
   let out_len = data.len() - LEN_U64;
   let mut out = unsafe { Box::<[u8]>::new_uninit_slice(out_len).assume_init() };
 
   Hasher::new()
-    .update(secret)
     .update(&hash.to_le_bytes())
+    .update(iv)
+    .update(secret)
     .finalize_xof()
     .fill(&mut out);
 
