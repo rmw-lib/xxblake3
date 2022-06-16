@@ -30,8 +30,8 @@ pub fn encrypt(secret: &[u8], data: &[u8]) -> Box<[u8]> {
   let out_data = &mut out[LEN_U64..];
 
   Hasher::new()
-    .update(&hash.to_le_bytes())
     .update(secret)
+    .update(&hash.to_le_bytes())
     .finalize_xof()
     .fill(out_data);
 
@@ -51,8 +51,8 @@ pub fn decrypt(secret: &[u8], data: &[u8]) -> Option<Box<[u8]>> {
   let mut out = unsafe { Box::<[u8]>::new_uninit_slice(out_len).assume_init() };
 
   Hasher::new()
-    .update(&hash.to_le_bytes())
     .update(secret)
+    .update(&hash.to_le_bytes())
     .finalize_xof()
     .fill(&mut out);
 
