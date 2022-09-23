@@ -1,0 +1,15 @@
+[package]
+name = "xxblake3"
+authors = ["rmw <i@user.tax>"]
+edition = "2021"
+version = "0.0.9"
+license = "AGPL-3.0-or-later"
+description = "encryption and decryption based on xxh3 and blake3"
+repository = "https://github.com/rmw-lib/xxblake3"
+documentation = "https://docs.rs/crate/xxblake3"
+readme = "README.md"
+
+[dependencies]
+blake3 = "1.3.1"
+xxhash-rust = {version="0.8.5",features=["xxh3"]}
+
