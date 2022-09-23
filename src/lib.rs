@@ -1,9 +1,10 @@
-use blake3::Hasher;
-use std::convert::TryInto;
-use std::hash::BuildHasher;
-use std::hash::Hasher;
-use xxhash_rust::xxh3::xxh3_64;
-use xxhash_rust::xxh3::Xxh3Builder;
+use std::{
+  alloc::{alloc, Layout},
+  convert::TryInto,
+  hash::{BuildHasher, Hasher},
+};
+
+use xxhash_rust::xxh3::{xxh3_64, Xxh3Builder};
 
 const LEN_U64: usize = std::mem::size_of::<u64>();
 const HASHER: Xxh3Builder = Xxh3Builder::new();
@@ -26,10 +27,10 @@ pub fn encrypt(secret: &[u8], iv: &[u8], data: &[u8]) -> Box<[u8]> {
   let hash = xxh3_64(data);
 
   let out_len = LEN_U64 + data.len();
-  let mut out = Box::new([u8; out_len]);
+  let mut out = Vec::with_capacity(out_len).into_boxed_slice();
   let out_data = &mut out[LEN_U64..];
 
-  Hasher::new()
+  blake3::Hasher::new()
     .update(&hash.to_le_bytes())
     .update(iv)
     .update(secret)
@@ -49,9 +50,9 @@ pub fn decrypt(secret: &[u8], iv: &[u8], data: &[u8]) -> Option<Box<[u8]>> {
   let ed = &data[LEN_U64..];
   let hash = u64::from_le_bytes(data[..LEN_U64].try_into().unwrap()) ^ hash_data_secret(ed, secret);
   let out_len = data.len() - LEN_U64;
-  let mut out = Box::new([u8; out_len]);
+  let mut out = Vec::with_capacity(out_len).into_boxed_slice();
 
-  Hasher::new()
+  blake3::Hasher::new()
     .update(&hash.to_le_bytes())
     .update(iv)
     .update(secret)
