@@ -1,5 +1,7 @@
 use blake3::Hasher;
 use std::convert::TryInto;
+use std::hash::BuildHasher;
+use std::hash::Hasher;
 use xxhash_rust::xxh3::xxh3_64;
 use xxhash_rust::xxh3::Xxh3Builder;
 
@@ -8,7 +10,7 @@ const HASHER: Xxh3Builder = Xxh3Builder::new();
 
 #[inline]
 pub fn hash_data_secret(secret: &[u8], data: &[u8]) -> u64 {
-  let mut h64 = HASHER::build_hasher();
+  let mut h64 = HASHER.build_hasher();
   h64.write(data);
   h64.write(secret);
   h64.finish()
