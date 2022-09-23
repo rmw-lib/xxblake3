@@ -1,14 +1,14 @@
 use blake3::Hasher;
-use core::hash::Hasher as _;
 use std::convert::TryInto;
 use xxhash_rust::xxh3::xxh3_64;
+use xxhash_rust::xxh3::Xxh3Builder;
 
 const LEN_U64: usize = std::mem::size_of::<u64>();
-const H64_SEED: u64 = 23456789;
+const HASHER: Xxh3Builder = Xxh3Builder::new();
 
 #[inline]
 pub fn hash_data_secret(secret: &[u8], data: &[u8]) -> u64 {
-  let mut h64 = xxhash_rust::xxh3::Xxh3Builder::with_seed(H64_SEED)::build_hasher();
+  let mut h64 = HASHER::build_hasher();
   h64.write(data);
   h64.write(secret);
   h64.finish()
@@ -34,13 +34,13 @@ pub fn encrypt(secret: &[u8], iv: &[u8], data: &[u8]) -> Box<[u8]> {
     .finalize_xof()
     .fill(out_data);
 
-    xor!(out_data, data);
+  xor!(out_data, data);
 
-    let hash = hash_data_secret(out_data, secret) ^ hash;
+  let hash = hash_data_secret(out_data, secret) ^ hash;
 
-    out[..LEN_U64].clone_from_slice(&hash.to_le_bytes());
+  out[..LEN_U64].clone_from_slice(&hash.to_le_bytes());
 
-    out
+  out
 }
 
 pub fn decrypt(secret: &[u8], iv: &[u8], data: &[u8]) -> Option<Box<[u8]>> {
@@ -56,11 +56,11 @@ pub fn decrypt(secret: &[u8], iv: &[u8], data: &[u8]) -> Option<Box<[u8]>> {
     .finalize_xof()
     .fill(&mut out);
 
-    xor!(out, ed);
+  xor!(out, ed);
 
-    if xxh3_64(&out) != hash {
-      None
-    } else {
-      Some(out)
-    }
+  if xxh3_64(&out) != hash {
+    None
+  } else {
+    Some(out)
+  }
 }
